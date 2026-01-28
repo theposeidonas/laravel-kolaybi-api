@@ -1,0 +1,9 @@
+/vendor
+composer.lock
+.env
+.phpunit.result.cache
+.DS_Store
+/.idea
+/.vscode
+/build
+/tests/fixtures/*.json
