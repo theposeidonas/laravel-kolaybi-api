@@ -16,7 +16,7 @@
 
 [![Laravel][Laravel.com]][Laravel-url]
 ![Packagist Downloads][downloads-url]
-![Tests](https://img.shields.io/github/actions/workflow/status/theposeidonas/laravel-kolaybi/phpunit.yml?style=for-the-badge&logo=github)
+![Tests](https://img.shields.io/github/actions/workflow/status/theposeidonas/laravel-kolaybi-api/phpunit.yml?style=for-the-badge&logo=github)
 
   <p align="center">
     Laravel için geliştirilmiş güncel KolayBi API paketi.
