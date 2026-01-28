@@ -205,18 +205,18 @@ Proje Linki: [https://github.com/theposeidonas/laravel-kolaybi-api](https://gith
 
 <p align="right">(<a href="#readme-top">Başa dön</a>)</p>
 
-[contributors-shield]: https://img.shields.io/github/contributors/theposeidonas/laravel-kolaybi.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/theposeidonas/laravel-kolaybi-api.svg?style=for-the-badge
 [contributors-url]: https://github.com/theposeidonas/laravel-kolaybi-api/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/theposeidonas/laravel-kolaybi.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/theposeidonas/laravel-kolaybi-api.svg?style=for-the-badge
 [forks-url]: https://github.com/theposeidonas/laravel-kolaybi-api/network/members
-[stars-shield]: https://img.shields.io/github/stars/theposeidonas/laravel-kolaybi.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/theposeidonas/laravel-kolaybi-api.svg?style=for-the-badge
 [stars-url]: https://github.com/theposeidonas/laravel-kolaybi-api/stargazers
-[issues-shield]: https://img.shields.io/github/issues/theposeidonas/laravel-kolaybi.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/theposeidonas/laravel-kolaybi-api.svg?style=for-the-badge
 [issues-url]: https://github.com/theposeidonas/laravel-kolaybi-api/issues
-[license-shield]: https://img.shields.io/github/license/theposeidonas/laravel-kolaybi.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/theposeidonas/laravel-kolaybi-api.svg?style=for-the-badge
 [license-url]: https://github.com/theposeidonas/laravel-kolaybi-api/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/theposeidonas/
 [Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
 [Laravel-url]: https://laravel.com
-[downloads-url]: https://img.shields.io/packagist/dt/theposeidonas/laravel-kolaybi?style=for-the-badge&color=007ec6&cacheSeconds=3600
+[downloads-url]: https://img.shields.io/packagist/dt/theposeidonas/laravel-kolaybi-api?style=for-the-badge&color=007ec6&cacheSeconds=3600
