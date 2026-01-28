@@ -7,3 +7,15 @@ composer.lock
 /.vscode
 /build
 /tests/fixtures/*.json
+
+storage/*.key
+Homestead.yaml
+Homestead.json
+/.vagrant
+
+/public/build
+/storage/pail
+.env.backup
+.env.production
+.phpactor.json
+auth.json
