@@ -8,7 +8,7 @@ use Theposeidonas\Kolaybi\Exceptions\KolaybiValidationException;
 use Theposeidonas\Kolaybi\Facades\Kolaybi;
 use Theposeidonas\Kolaybi\Tests\TestCase;
 
-class CustomerResourceTest extends TestCase
+class AssociateResourceTest extends TestCase
 {
     public function test_list_success()
     {
@@ -19,7 +19,7 @@ class CustomerResourceTest extends TestCase
             ], 200),
         ]);
 
-        $response = Kolaybi::customer()->list();
+        $response = Kolaybi::associate()->list();
 
         $this->assertTrue($response->isSuccess());
         $this->assertCount(1, $response->getData());
@@ -37,7 +37,7 @@ class CustomerResourceTest extends TestCase
         $this->expectException(KolaybiApiException::class);
         $this->expectExceptionCode(401);
 
-        Kolaybi::customer()->list();
+        Kolaybi::associate()->list();
     }
 
     public function test_create_success()
@@ -49,7 +49,7 @@ class CustomerResourceTest extends TestCase
             ], 201),
         ]);
 
-        $response = Kolaybi::customer()->create([
+        $response = Kolaybi::associate()->create([
             'name' => 'Baran',
             'surname' => 'Arda',
             'identity_no' => '12345678901',
@@ -62,7 +62,7 @@ class CustomerResourceTest extends TestCase
     {
         $this->expectException(KolaybiValidationException::class);
 
-        Kolaybi::customer()->create([
+        Kolaybi::associate()->create([
             'name' => 'B',
         ]);
     }
@@ -76,7 +76,7 @@ class CustomerResourceTest extends TestCase
             ], 200),
         ]);
 
-        $response = Kolaybi::customer()->addressCreate([
+        $response = Kolaybi::associate()->addressCreate([
             'associate_id' => 1,
             'city' => 'Istanbul',
             'district' => 'Kadikoy',
@@ -90,7 +90,7 @@ class CustomerResourceTest extends TestCase
     {
         $this->expectException(KolaybiValidationException::class);
 
-        Kolaybi::customer()->addressCreate([
+        Kolaybi::associate()->addressCreate([
             'associate_id' => 1,
         ]);
     }
@@ -104,7 +104,7 @@ class CustomerResourceTest extends TestCase
             ], 200),
         ]);
 
-        $response = Kolaybi::customer()->transactions(1);
+        $response = Kolaybi::associate()->transactions(1);
 
         $this->assertTrue($response->isSuccess());
     }
@@ -121,7 +121,7 @@ class CustomerResourceTest extends TestCase
         $this->expectException(KolaybiApiException::class);
         $this->expectExceptionCode(404);
 
-        Kolaybi::customer()->transactions(999);
+        Kolaybi::associate()->transactions(999);
     }
 
     public function test_payment_success()
@@ -133,7 +133,7 @@ class CustomerResourceTest extends TestCase
             ], 200),
         ]);
 
-        $response = Kolaybi::customer()->payment(1, [
+        $response = Kolaybi::associate()->payment(1, [
             'amount' => 100,
             'currency' => 'TRY',
             'gateway_id' => 5,
@@ -146,7 +146,7 @@ class CustomerResourceTest extends TestCase
     {
         $this->expectException(KolaybiValidationException::class);
 
-        Kolaybi::customer()->payment(1, [
+        Kolaybi::associate()->payment(1, [
             'amount' => 'invalid',
             'currency' => 'TRY',
             'gateway_id' => 5,
@@ -162,7 +162,7 @@ class CustomerResourceTest extends TestCase
             ], 200),
         ]);
 
-        $response = Kolaybi::customer()->proceed(1, [
+        $response = Kolaybi::associate()->proceed(1, [
             'amount' => 200,
             'currency' => 'USD',
             'gateway_id' => 10,
@@ -175,7 +175,7 @@ class CustomerResourceTest extends TestCase
     {
         $this->expectException(KolaybiValidationException::class);
 
-        Kolaybi::customer()->proceed(1, [
+        Kolaybi::associate()->proceed(1, [
             'amount' => 200,
             'gateway_id' => 10,
         ]);

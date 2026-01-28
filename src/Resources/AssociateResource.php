@@ -11,7 +11,7 @@ use Theposeidonas\Kolaybi\Exceptions\KolaybiApiException;
 use Theposeidonas\Kolaybi\Exceptions\KolaybiValidationException;
 use Theposeidonas\Kolaybi\Responses\KolaybiResponse;
 
-class CustomerResource extends BaseResource
+class AssociateResource extends BaseResource
 {
     /**
      * @throws KolaybiApiException|ConnectionException

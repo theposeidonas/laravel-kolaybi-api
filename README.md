@@ -86,7 +86,7 @@ Tüm modüllere Facade üzerinden erişebilirsiniz:
 ```php
 Kolaybi::bank(); // Kasa ve Banka Hesapları
 Kolaybi::company(); // Şirket Yönetimi
-Kolaybi::customer(); // Cari (Müşteri ve Tedarikçi) Yönetimi
+Kolaybi::associate(); // Cari (Müşteri ve Tedarikçi) Yönetimi
 Kolaybi::invoice(); // Satış ve Alış Faturası İşlemleri
 Kolaybi::product(); // Ürün, Hizmet ve Stok Yönetimi
 Kolaybi::order(); // Sipariş Yönetimi
@@ -129,14 +129,14 @@ Kolaybi::bank()->transactions($vaultId); // Kasa/banka hesap hareketlerini liste
 Kolaybi::company()->list(); // Yetkili olunan şirketleri listeleme -> https://developer.kolaybi.com/docs/companies/list/
 ```
 
-### Cari Hesap (CustomerResource)
+### Cari Hesap (AssociatesResource)
 ```php 
-Kolaybi::customer()->list(); // Cari hesapları (müşteri ve tedarikçi) listeleme -> https://developer.kolaybi.com/docs/associates/list/ 
-Kolaybi::customer()->create($data); // Yeni cari hesap (müşteri/tedarikçi) oluşturma -> https://developer.kolaybi.com/docs/associates/create/ 
-Kolaybi::customer()->addressCreate($data); // Mevcut bir cari hesaba yeni adres ekleme -> https://developer.kolaybi.com/docs/associates/addresses/ 
-Kolaybi::customer()->transactions($associateId); // Cari hesaba ait tüm hareketleri listeleme -> https://developer.kolaybi.com/docs/associates/transactions/ 
-Kolaybi::customer()->payment($id, $data); // Cari hesaptan tahsilat yapma (Ödeme Girişi) -> https://developer.kolaybi.com/docs/associates/payment/ 
-Kolaybi::customer()->proceed($id, $data); // Cari hesaba ödeme yapma (Ödeme Çıkışı) -> https://developer.kolaybi.com/docs/associates/proceed/ 
+Kolaybi::associate()->list(); // Cari hesapları (müşteri ve tedarikçi) listeleme -> https://developer.kolaybi.com/docs/associates/list/ 
+Kolaybi::associate()->create($data); // Yeni cari hesap (müşteri/tedarikçi) oluşturma -> https://developer.kolaybi.com/docs/associates/create/ 
+Kolaybi::associate()->addressCreate($data); // Mevcut bir cari hesaba yeni adres ekleme -> https://developer.kolaybi.com/docs/associates/addresses/ 
+Kolaybi::associate()->transactions($associateId); // Cari hesaba ait tüm hareketleri listeleme -> https://developer.kolaybi.com/docs/associates/transactions/ 
+Kolaybi::associate()->payment($id, $data); // Cari hesaptan tahsilat yapma (Ödeme Girişi) -> https://developer.kolaybi.com/docs/associates/payment/ 
+Kolaybi::associate()->proceed($id, $data); // Cari hesaba ödeme yapma (Ödeme Çıkışı) -> https://developer.kolaybi.com/docs/associates/proceed/ 
 ```
 
 ### Fatura (InvoiceResource)

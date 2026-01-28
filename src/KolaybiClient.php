@@ -9,7 +9,7 @@ use Theposeidonas\Kolaybi\Exceptions\KolaybiApiException;
 use Theposeidonas\Kolaybi\Resources\AuthResource;
 use Theposeidonas\Kolaybi\Resources\BankResource;
 use Theposeidonas\Kolaybi\Resources\CompanyResource;
-use Theposeidonas\Kolaybi\Resources\CustomerResource;
+use Theposeidonas\Kolaybi\Resources\AssociateResource;
 use Theposeidonas\Kolaybi\Resources\InvoiceResource;
 use Theposeidonas\Kolaybi\Resources\OrderResource;
 use Theposeidonas\Kolaybi\Resources\ProductResource;
@@ -42,9 +42,9 @@ class KolaybiClient
         return new CompanyResource($this);
     }
 
-    public function customer(): CustomerResource
+    public function associate(): AssociateResource
     {
-        return new CustomerResource($this);
+        return new AssociateResource($this);
     }
 
     public function invoice(): InvoiceResource
