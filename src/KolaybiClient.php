@@ -122,7 +122,7 @@ class KolaybiClient
     {
         return Http::withToken($this->auth()->getToken())
             ->baseUrl($this->config['base_url'])
-            ->withHeaders(['X-Channel-Id' => $this->config['channel_id']])
+            ->withHeaders(['Channel' => $this->config['channel_id']])
             ->acceptJson();
     }
 }
