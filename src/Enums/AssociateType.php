@@ -2,8 +2,12 @@
 
 namespace Theposeidonas\Kolaybi\Enums;
 
+use Theposeidonas\Kolaybi\Enums\Concerns\HasValues;
+
 enum AssociateType: string
 {
+    use HasValues;
+
     case FREELANCER = 'freelancer_employee';
     case FULL_TIME = 'full_time_employee';
     case PART_TIME = 'part_time_employee';
@@ -19,9 +23,4 @@ enum AssociateType: string
     case SUBCONTRACTOR = 'subcontractor';
     case POTENTIAL = 'potential_customer';
     case SHIPPING = 'shipping_company';
-
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
-    }
 }

@@ -6,6 +6,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Validation\Rule;
 use Theposeidonas\Kolaybi\Enums\Currency;
 use Theposeidonas\Kolaybi\Enums\ProductType;
+use Theposeidonas\Kolaybi\Enums\StockFlowDirection;
 use Theposeidonas\Kolaybi\Enums\VATRate;
 use Theposeidonas\Kolaybi\Exceptions\KolaybiApiException;
 use Theposeidonas\Kolaybi\Exceptions\KolaybiValidationException;
@@ -96,7 +97,7 @@ class ProductResource extends BaseResource
         $validated = $this->validate($data, [
             'product_id' => 'required|integer',
             'quantity' => 'required|numeric',
-            'stock_flow_direction' => ['required', 'integer', Rule::in([1, -1])],
+            'stock_flow_direction' => ['required', 'integer', Rule::in(StockFlowDirection::values())],
             'description' => 'nullable|string',
             'unit_amount' => 'nullable|numeric',
             'currency' => ['nullable', Rule::in(Currency::values())],

@@ -17,8 +17,8 @@ class OrderResourceTest extends TestCase
             '*/access_token' => Http::response(['success' => true, 'data' => 'token'], 200),
             '*/kolaybi/v1/orders' => Http::response([
                 'success' => true,
-                'data' => ['id' => 500]
-            ], 201)
+                'data' => ['id' => 500],
+            ], 201),
         ]);
 
         $response = Kolaybi::order()->create([
@@ -31,9 +31,9 @@ class OrderResourceTest extends TestCase
                     'product_id' => 1,
                     'quantity' => '10',
                     'unit_price' => '50.5',
-                    'vat_rate' => 20
-                ]
-            ]
+                    'vat_rate' => 20,
+                ],
+            ],
         ]);
 
         $this->assertTrue($response->isSuccess());
@@ -49,7 +49,7 @@ class OrderResourceTest extends TestCase
         $this->expectException(KolaybiValidationException::class);
 
         Kolaybi::order()->create([
-            'contact_id' => 1
+            'contact_id' => 1,
         ]);
     }
 
@@ -59,8 +59,8 @@ class OrderResourceTest extends TestCase
             '*/access_token' => Http::response(['success' => true, 'data' => 'token'], 200),
             '*/kolaybi/v1/orders/500' => Http::response([
                 'success' => true,
-                'data' => ['id' => 500, 'description' => 'Test Sipariş']
-            ], 200)
+                'data' => ['id' => 500, 'description' => 'Test Sipariş'],
+            ], 200),
         ]);
 
         $response = Kolaybi::order()->find(500);
@@ -78,8 +78,8 @@ class OrderResourceTest extends TestCase
             '*/access_token' => Http::response(['success' => true, 'data' => 'token'], 200),
             '*/kolaybi/v1/orders/999' => Http::response([
                 'success' => false,
-                'message' => 'Sipariş bulunamadı'
-            ], 404)
+                'message' => 'Sipariş bulunamadı',
+            ], 404),
         ]);
 
         $this->expectException(KolaybiApiException::class);

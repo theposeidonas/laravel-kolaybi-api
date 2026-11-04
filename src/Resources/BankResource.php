@@ -3,6 +3,8 @@
 namespace Theposeidonas\Kolaybi\Resources;
 
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Validation\Rule;
+use Theposeidonas\Kolaybi\Enums\VaultType;
 use Theposeidonas\Kolaybi\Exceptions\KolaybiApiException;
 use Theposeidonas\Kolaybi\Exceptions\KolaybiValidationException;
 use Theposeidonas\Kolaybi\Responses\KolaybiResponse;
@@ -18,7 +20,7 @@ class BankResource extends BaseResource
     {
         $validated = $this->validate($query, [
             'currency' => 'nullable|string',
-            'type' => 'nullable|string|in:bank_account,safe_deposit',
+            'type' => ['nullable', 'string', Rule::in(VaultType::values())],
         ]);
 
         return $this->client->get('/kolaybi/v1/vaults', $validated);

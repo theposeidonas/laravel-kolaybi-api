@@ -46,6 +46,13 @@ KolayBi API entegrasyonu yaparken tekrar eden kimlik doğrulama işlemleri, dina
 
 Paketi kullanabilmek için KolayBi üzerinden API Key ve Channel ID bilgilerine sahip olmanız gerekmektedir.
 
+### Gereksinimler
+
+| Paket | Sürüm |
+|-------|-------|
+| PHP | 8.3, 8.4, 8.5 |
+| Laravel | 12.x, 13.x |
+
 ### Kurulum
 
 ```shell
@@ -67,6 +74,17 @@ KOLAYBI_API_KEY="your-api-key"
 KOLAYBI_CHANNEL_ID="your-channel-id"
 KOLAYBI_SANDBOX=true
 KOLAYBI_BASE_URL="https://ofis-sandbox-api.kolaybi.com"
+```
+
+Opsiyonel ayarlar:
+
+```dotenv
+KOLAYBI_TIMEOUT=30            # İstek zaman aşımı (saniye)
+KOLAYBI_CONNECT_TIMEOUT=10    # Bağlantı zaman aşımı (saniye)
+KOLAYBI_RETRY_TIMES=0         # Bağlantı hatası / 5xx durumunda tekrar deneme sayısı
+KOLAYBI_RETRY_SLEEP=200       # Denemeler arası bekleme (ms)
+KOLAYBI_CACHE_STORE=          # Token için kullanılacak cache store (boşsa varsayılan)
+KOLAYBI_TOKEN_TTL=82800       # Token cache süresi (saniye)
 ```
 
 <p align="right">(<a href="#readme-top">Başa dön</a>)</p>
@@ -93,6 +111,10 @@ Kolaybi::order(); // Sipariş Yönetimi
 Kolaybi::proforma(); // Proforma Fatura İşlemleri
 Kolaybi::tag(); // Etiket Yönetimi
 Kolaybi::user(); // Kullanıcı ve Yetki Yönetimi
+Kolaybi::cheque(); // Çek Yönetimi
+Kolaybi::bond(); // Senet Yönetimi
+Kolaybi::onlineBank(); // Online Banka Entegrasyonu
+Kolaybi::financialActionType(); // Gider Tipleri
 ```
 
 <p align="right">(<a href="#readme-top">Başa dön</a>)</p>
@@ -106,9 +128,66 @@ Tüm istekler `KolaybiResponse` sınıfı döner. Başarı kontrolü ve veriye e
 $response = Kolaybi::bank()->list();
 
 if ($response->isSuccess()) {
-$data = $response->getData();
-$status = $response->getStatus();
+    $data = $response->getData();
+    $status = $response->getStatus();
 }
+
+$response->getData('meta.code'); // Dot notation ile erişim
+$response['id']; // ArrayAccess
+$response->toArray(); // Ham yanıt
+$response->toJson();
+```
+
+##### Hata Yönetimi
+
+```php
+use Theposeidonas\Kolaybi\Exceptions\KolaybiApiException;
+use Theposeidonas\Kolaybi\Exceptions\KolaybiValidationException;
+
+try {
+    Kolaybi::invoice()->create($data);
+} catch (KolaybiValidationException $e) {
+    $e->errors(); // ['contact_id' => ['The contact id field is required.']]
+} catch (KolaybiApiException $e) {
+    $e->getStatus();
+    $e->getResponse();
+}
+```
+
+Her iki exception da `KolaybiException` sınıfından türer. Token süresi dolduğunda (401) paket token'ı otomatik yeniler ve isteği bir kez tekrar dener.
+
+##### Enum Kullanımı
+
+Parametrelerde string değerler yerine enum'lar ve `DateTimeInterface` nesneleri de gönderebilirsiniz:
+
+```php
+use Theposeidonas\Kolaybi\Enums\Currency;
+use Theposeidonas\Kolaybi\Enums\VATRate;
+
+Kolaybi::proforma()->create([
+    'contact_id' => 1,
+    'address_id' => 1,
+    'order_date' => now(),
+    'currency' => Currency::TRY,
+    'items' => [
+        ['product_id' => 1, 'quantity' => '1', 'unit_price' => '100', 'vat_rate' => VATRate::RATE_20],
+    ],
+]);
+```
+
+##### Çoklu Hesap
+
+```php
+Kolaybi::withConfig(['api_key' => '...', 'channel_id' => '...'])->invoice()->list();
+```
+
+##### Ham İstek
+
+Paketin henüz kapsamadığı endpointler için:
+
+```php
+Kolaybi::get('/kolaybi/v1/...', $query);
+Kolaybi::post('/kolaybi/v1/...', $data);
 ```
 
 <p align="right">(<a href="#readme-top">Başa dön</a>)</p>
@@ -121,7 +200,7 @@ Aşağıda paket içerisindeki kullanabileceğiniz tüm fonksiyonlar bulunuyor. 
 ```php 
 Kolaybi::bank()->list($query); // Kasa ve banka hesaplarını listeleme -> https://developer.kolaybi.com/docs/vaults/list/ 
 Kolaybi::bank()->find($vaultId); // Belirli bir kasa/banka detayını görüntüleme -> https://developer.kolaybi.com/docs/vaults/detail 
-Kolaybi::bank()->transactions($vaultId); // Kasa/banka hesap hareketlerini listeleme -> https://developer.kolaybi.com/docs/vaults/transactions] 
+Kolaybi::bank()->transactions($vaultId); // Kasa/banka hesap hareketlerini listeleme -> https://developer.kolaybi.com/docs/vaults/transactions 
 ```
 
 #### Şirket (CompanyResource)
@@ -131,27 +210,31 @@ Kolaybi::company()->list(); // Yetkili olunan şirketleri listeleme -> https://d
 
 ### Cari Hesap (AssociatesResource)
 ```php 
-Kolaybi::associate()->list(); // Cari hesapları (müşteri ve tedarikçi) listeleme -> https://developer.kolaybi.com/docs/associates/list/ 
+Kolaybi::associate()->list($query); // Cari hesapları (müşteri ve tedarikçi) listeleme -> https://developer.kolaybi.com/docs/associates/list/ 
+Kolaybi::associate()->find($associateId); // Cari detayı -> https://developer.kolaybi.com/docs/associates/detail
 Kolaybi::associate()->create($data); // Yeni cari hesap (müşteri/tedarikçi) oluşturma -> https://developer.kolaybi.com/docs/associates/create/ 
 Kolaybi::associate()->addressCreate($data); // Mevcut bir cari hesaba yeni adres ekleme -> https://developer.kolaybi.com/docs/associates/addresses/ 
 Kolaybi::associate()->transactions($associateId); // Cari hesaba ait tüm hareketleri listeleme -> https://developer.kolaybi.com/docs/associates/transactions/ 
 Kolaybi::associate()->payment($id, $data); // Cari hesaptan tahsilat yapma (Ödeme Girişi) -> https://developer.kolaybi.com/docs/associates/payment/ 
 Kolaybi::associate()->proceed($id, $data); // Cari hesaba ödeme yapma (Ödeme Çıkışı) -> https://developer.kolaybi.com/docs/associates/proceed/ 
+Kolaybi::associate()->transfer($id, $data); // Cari virman işlemi -> https://developer.kolaybi.com/docs/associates/transfer
 ```
 
 ### Fatura (InvoiceResource)
 ```php 
 Kolaybi::invoice()->list($query); // Satış ve alış faturalarını listeleme -> https://developer.kolaybi.com/docs/invoices/list/ 
 Kolaybi::invoice()->create($data); // Yeni fatura (satış/alış) oluşturma -> https://developer.kolaybi.com/docs/invoices/create/ 
-Kolaybi::invoice()->find($documentId); // Belirli bir faturanın detaylarını görüntüleme -> https://developer.kolaybi.com/docs/invoices/detail/ 
-Kolaybi::invoice()->formalize($documentId); // E-Fatura Gönderimi (Taslak Faturayı Resmileştirme) -> https://developer.kolaybi.com/docs/invoices/e-document/ 
+Kolaybi::invoice()->find($documentId, $includeDraft = false); // Belirli bir faturanın detaylarını görüntüleme -> https://developer.kolaybi.com/docs/invoices/detail/ 
+Kolaybi::invoice()->formalize($documentId, $prefix = null); // E-Fatura Gönderimi (Taslak Faturayı Resmileştirme) -> https://developer.kolaybi.com/docs/invoices/e-document/ 
 Kolaybi::invoice()->collect($data); // Fatura Tahsilat -> https://developer.kolaybi.com/docs/invoices/proceed/ 
+Kolaybi::invoice()->pay($data); // Fatura Ödeme -> https://developer.kolaybi.com/docs/invoices/payment
 Kolaybi::invoice()->delete($documentId); // Mevcut bir faturayı silme -> https://developer.kolaybi.com/docs/invoices/delete/ 
 Kolaybi::invoice()->deleteCollection($documentId); // Fatura üzerindeki tahsilat/ödeme kaydını silme -> https://developer.kolaybi.com/docs/invoices/proceed-delete/ 
 Kolaybi::invoice()->cancelEDocument($documentId); // Resmileşmiş bir e-belgeyi iptal etme -> https://developer.kolaybi.com/docs/invoices/e-document-cancel/ 
-Kolaybi::invoice()->viewEDocument($uuid); // E-Belgenin görüntüsünü (HTML/PDF) alma -> https://developer.kolaybi.com/docs/invoices/e-document-view/ 
+Kolaybi::invoice()->viewEDocument($uuid, ['output_type' => 'pdf', 'direction' => 'outbound']); // E-Belgenin görüntüsünü (HTML/PDF) alma -> https://developer.kolaybi.com/docs/invoices/e-document-view/ 
 Kolaybi::invoice()->resendEDocument($documentId); // E-Belgeyi alıcıya tekrar e-posta ile gönderme -> https://developer.kolaybi.com/docs/invoices/resend/ 
 Kolaybi::invoice()->listEInvoices($query); // Gelen kutusuna düşen e-faturaları listeleme -> https://developer.kolaybi.com/docs/e-documents/list 
+Kolaybi::invoice()->listEWaybills($query); // e-İrsaliye listeleme -> https://developer.kolaybi.com/docs/e-documents/waybills
 ```
 
 ### Sipariş (OrderResource)
@@ -179,6 +262,7 @@ Kolaybi::proforma()->find($documentId); // Belirli bir proforma faturanın detay
 ```php 
 Kolaybi::tag()->list($query); // Etiketleri listeleme -> https://developer.kolaybi.com/docs/tags/list/ 
 Kolaybi::tag()->find($tagId); // Belirli bir etiketin detaylarını görüntüleme -> https://developer.kolaybi.com/docs/tags/detail 
+Kolaybi::tag()->sync('CommercialDoc', $id, [1, 2]); // Etiket eşitleme -> https://developer.kolaybi.com/docs/tags/sync
 ```
 
 ### Kullanıcı (UserResource)
@@ -186,10 +270,42 @@ Kolaybi::tag()->find($tagId); // Belirli bir etiketin detaylarını görüntüle
 Kolaybi::user()->list(); // Şirketteki kullanıcıları listeleme -> https://developer.kolaybi.com/docs/users/list/ 
 ```
 
+### Çek (ChequeResource)
+```php
+Kolaybi::cheque()->list($query); // Çek listeleme -> https://developer.kolaybi.com/docs/cheques/list
+Kolaybi::cheque()->find($chequeId); // Çek detayı -> https://developer.kolaybi.com/docs/cheques/detail
+```
+
+### Senet (BondResource)
+```php
+Kolaybi::bond()->list($query); // Senet listeleme -> https://developer.kolaybi.com/docs/bonds/list
+Kolaybi::bond()->find($bondId); // Senet detayı -> https://developer.kolaybi.com/docs/bonds/detail
+```
+
+### Online Banka (OnlineBankResource)
+```php
+Kolaybi::onlineBank()->banks(); // Banka listeleme -> https://developer.kolaybi.com/docs/online-bank/banks
+Kolaybi::onlineBank()->bankAccounts($bankId); // Bankaya ait hesaplar -> https://developer.kolaybi.com/docs/online-bank/bank-accounts
+Kolaybi::onlineBank()->bankTransactions($bankId, $query); // Bankaya ait hareketler -> https://developer.kolaybi.com/docs/online-bank/bank-transactions
+Kolaybi::onlineBank()->accounts(); // Hesap listeleme -> https://developer.kolaybi.com/docs/online-bank/accounts
+Kolaybi::onlineBank()->account($accountId); // Hesap detayı -> https://developer.kolaybi.com/docs/online-bank/account-detail
+Kolaybi::onlineBank()->accountTransactions($accountId, $query); // Hesap hareketleri -> https://developer.kolaybi.com/docs/online-bank/transactions
+Kolaybi::onlineBank()->transaction($transactionId); // Hareket detayı -> https://developer.kolaybi.com/docs/online-bank/transaction-detail
+Kolaybi::onlineBank()->map($transactionId, $data); // Hareket eşleştirme -> https://developer.kolaybi.com/docs/online-bank/map
+Kolaybi::onlineBank()->unmap($transactionId); // Eşleştirme kaldırma -> https://developer.kolaybi.com/docs/online-bank/unmap
+```
+
+### Gider Tipi (FinancialActionTypeResource)
+```php
+Kolaybi::financialActionType()->list(); // Gider tipleri -> https://developer.kolaybi.com/docs/financial-action-types/list
+```
+
 ## TODO
 
 - [x] Temel Resource yapıları tamamlandı.
 - [x] Unit testler eklendi.
+- [x] Laravel 13 ve PHP 8.5 desteği.
+- [x] Otomatik token yenileme, timeout ve retry desteği.
 
 ## Lisanslama
 

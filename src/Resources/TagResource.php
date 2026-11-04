@@ -31,4 +31,24 @@ class TagResource extends BaseResource
     {
         return $this->client->get("/kolaybi/v1/tags/{$tagId}");
     }
+
+    /**
+     * @param  list<int>  $tagIds
+     *
+     * @throws KolaybiApiException|KolaybiValidationException|ConnectionException
+     */
+    public function sync(string $type, int $id, array $tagIds): KolaybiResponse
+    {
+        $validated = $this->validate(['type' => $type, 'tag_ids' => $tagIds], [
+            'type' => 'required|string',
+            'tag_ids' => 'present|array',
+            'tag_ids.*' => 'integer',
+        ]);
+
+        return $this->client->put("/kolaybi/v1/tags/{$validated['type']}/{$id}", [
+            'relations' => [
+                'tags' => array_map(fn (int|string $tagId): array => ['id' => (int) $tagId], array_values($validated['tag_ids'])),
+            ],
+        ]);
+    }
 }

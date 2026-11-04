@@ -34,7 +34,7 @@ class OrderResource extends BaseResource
             'subtotal_discount_amount' => 'nullable|numeric',
             'exchange_rate' => 'nullable|string',
 
-            'items' => 'required|array|min:1',
+            'items' => 'nullable|array',
             'items.*.product_id' => 'required|integer',
             'items.*.quantity' => 'required|string',
             'items.*.unit_price' => 'required|string',

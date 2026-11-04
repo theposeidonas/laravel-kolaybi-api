@@ -3,8 +3,10 @@
 namespace Theposeidonas\Kolaybi\Tests\Feature;
 
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Http;
 use Theposeidonas\Kolaybi\Exceptions\KolaybiApiException;
 use Theposeidonas\Kolaybi\Exceptions\KolaybiValidationException;
+use Theposeidonas\Kolaybi\Facades\Kolaybi;
 use Theposeidonas\Kolaybi\Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -16,13 +18,13 @@ class AuthenticationTest extends TestCase
      */
     public function test_it_can_list_tags_with_mock_data()
     {
-        \Illuminate\Support\Facades\Http::fake([
-            '*/access_token' => \Illuminate\Support\Facades\Http::response([
+        Http::fake([
+            '*/access_token' => Http::response([
                 'success' => true,
                 'data' => 'mock-token',
             ], 200),
 
-            '*/kolaybi/v1/tags' => \Illuminate\Support\Facades\Http::response([
+            '*/kolaybi/v1/tags' => Http::response([
                 'success' => true,
                 'data' => [
                     ['id' => 1, 'name' => 'Acil'],
@@ -31,7 +33,7 @@ class AuthenticationTest extends TestCase
             ], 200),
         ]);
 
-        $response = \Theposeidonas\Kolaybi\Facades\Kolaybi::tag()->list();
+        $response = Kolaybi::tag()->list();
 
         $this->assertTrue($response->isSuccess());
         $this->assertEquals(200, $response->getStatus());

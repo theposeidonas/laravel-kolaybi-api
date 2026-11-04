@@ -3,6 +3,7 @@
 namespace Theposeidonas\Kolaybi\Tests\Unit;
 
 use Illuminate\Support\Facades\Http;
+use Theposeidonas\Kolaybi\Enums\Currency;
 use Theposeidonas\Kolaybi\Exceptions\KolaybiApiException;
 use Theposeidonas\Kolaybi\Exceptions\KolaybiValidationException;
 use Theposeidonas\Kolaybi\Facades\Kolaybi;
@@ -15,8 +16,8 @@ class ProductResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/products*' => Http::response([
                 'success' => true,
-                'data' => [['id' => 1, 'name' => 'MacBook Air']]
-            ], 200)
+                'data' => [['id' => 1, 'name' => 'MacBook Air']],
+            ], 200),
         ]);
 
         $response = Kolaybi::product()->list(['name' => 'MacBook']);
@@ -37,14 +38,14 @@ class ProductResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/products' => Http::response([
                 'success' => true,
-                'data' => ['id' => 10, 'name' => 'Tesla Model Y']
-            ], 201)
+                'data' => ['id' => 10, 'name' => 'Tesla Model Y'],
+            ], 201),
         ]);
 
         $response = Kolaybi::product()->create([
             'name' => 'Tesla Model Y',
             'price' => 2000000,
-            'price_currency' => \Theposeidonas\Kolaybi\Enums\Currency::values()[0]
+            'price_currency' => Currency::values()[0],
         ]);
 
         $this->assertTrue($response->isSuccess());
@@ -56,7 +57,7 @@ class ProductResourceTest extends TestCase
         $this->expectException(KolaybiValidationException::class);
 
         Kolaybi::product()->create([
-            'code' => 'P-001'
+            'code' => 'P-001',
         ]);
     }
 
@@ -65,8 +66,8 @@ class ProductResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/products/10' => Http::response([
                 'success' => true,
-                'data' => ['id' => 10, 'name' => 'Tesla Model Y']
-            ], 200)
+                'data' => ['id' => 10, 'name' => 'Tesla Model Y'],
+            ], 200),
         ]);
 
         $response = Kolaybi::product()->find(10);
@@ -80,8 +81,8 @@ class ProductResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/products/999' => Http::response([
                 'success' => false,
-                'message' => 'Product not found'
-            ], 404)
+                'message' => 'Product not found',
+            ], 404),
         ]);
 
         $this->expectException(KolaybiApiException::class);
@@ -95,12 +96,12 @@ class ProductResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/products/10' => Http::response([
                 'success' => true,
-                'data' => ['id' => 10, 'name' => 'Tesla Model Y Juniper']
-            ], 200)
+                'data' => ['id' => 10, 'name' => 'Tesla Model Y Juniper'],
+            ], 200),
         ]);
 
         $response = Kolaybi::product()->update(10, [
-            'name' => 'Tesla Model Y Juniper'
+            'name' => 'Tesla Model Y Juniper',
         ]);
 
         $this->assertTrue($response->isSuccess());
@@ -112,7 +113,7 @@ class ProductResourceTest extends TestCase
         $this->expectException(KolaybiValidationException::class);
 
         Kolaybi::product()->update(10, [
-            'price' => 'not-numeric'
+            'price' => 'not-numeric',
         ]);
     }
 
@@ -121,14 +122,14 @@ class ProductResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/stock_histories' => Http::response([
                 'success' => true,
-                'data' => ['id' => 1, 'quantity' => 5]
-            ], 201)
+                'data' => ['id' => 1, 'quantity' => 5],
+            ], 201),
         ]);
 
         $response = Kolaybi::product()->stock([
             'product_id' => 10,
             'quantity' => 5,
-            'stock_flow_direction' => 1
+            'stock_flow_direction' => 1,
         ]);
 
         $this->assertTrue($response->isSuccess());
@@ -141,7 +142,7 @@ class ProductResourceTest extends TestCase
         Kolaybi::product()->stock([
             'product_id' => 10,
             'quantity' => 5,
-            'stock_flow_direction' => 0
+            'stock_flow_direction' => 0,
         ]);
     }
 }

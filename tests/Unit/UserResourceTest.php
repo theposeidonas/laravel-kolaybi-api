@@ -16,9 +16,9 @@ class UserResourceTest extends TestCase
                 'success' => true,
                 'data' => [
                     ['id' => 1, 'email' => 'baran@baran.com'],
-                    ['id' => 2, 'email' => 'arda@baran.com']
-                ]
-            ], 200)
+                    ['id' => 2, 'email' => 'arda@baran.com'],
+                ],
+            ], 200),
         ]);
 
         $response = Kolaybi::user()->list();
@@ -33,8 +33,8 @@ class UserResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/users' => Http::response([
                 'success' => false,
-                'message' => 'Unauthorized access'
-            ], 401)
+                'message' => 'Unauthorized access',
+            ], 401),
         ]);
 
         $this->expectException(KolaybiApiException::class);
