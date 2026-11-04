@@ -2,8 +2,12 @@
 
 namespace Theposeidonas\Kolaybi\Enums;
 
+use Theposeidonas\Kolaybi\Enums\Concerns\HasValues;
+
 enum AddressType: string
 {
+    use HasValues;
+
     case DELIVERY = 'delivery';
     case INVOICE = 'invoice';
     case SHIPMENT = 'shipment';
@@ -11,9 +15,4 @@ enum AddressType: string
     case COMPANY = 'company';
     case ASSOCIATE = 'associate';
     case OTHER = 'other';
-
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
-    }
 }

@@ -4,6 +4,7 @@ namespace Theposeidonas\Kolaybi\Tests\Unit;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use Theposeidonas\Kolaybi\Enums\InvoiceType;
 use Theposeidonas\Kolaybi\Exceptions\KolaybiApiException;
 use Theposeidonas\Kolaybi\Exceptions\KolaybiValidationException;
 use Theposeidonas\Kolaybi\Facades\Kolaybi;
@@ -21,13 +22,13 @@ class InvoiceResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/invoices*' => Http::response([
                 'success' => true,
-                'data' => [['id' => 1, 'serial_no' => 'INV2026001']]
-            ], 200)
+                'data' => [['id' => 1, 'serial_no' => 'INV2026001']],
+            ], 200),
         ]);
 
-        $validType = \Theposeidonas\Kolaybi\Enums\InvoiceType::values()[0];
+        $validType = InvoiceType::values()[0];
 
-        $response = \Theposeidonas\Kolaybi\Facades\Kolaybi::invoice()->list(['type' => $validType]);
+        $response = Kolaybi::invoice()->list(['type' => $validType]);
 
         $this->assertTrue($response->isSuccess());
         $this->assertCount(1, $response->getData());
@@ -45,8 +46,8 @@ class InvoiceResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/invoices' => Http::response([
                 'success' => true,
-                'data' => ['id' => 100]
-            ], 201)
+                'data' => ['id' => 100],
+            ], 201),
         ]);
 
         $response = Kolaybi::invoice()->create([
@@ -59,9 +60,9 @@ class InvoiceResourceTest extends TestCase
                     'product_id' => 1,
                     'quantity' => '1',
                     'unit_price' => '100',
-                    'vat_rate' => 20
-                ]
-            ]
+                    'vat_rate' => 20,
+                ],
+            ],
         ]);
 
         $this->assertTrue($response->isSuccess());
@@ -72,7 +73,7 @@ class InvoiceResourceTest extends TestCase
         $this->expectException(KolaybiValidationException::class);
 
         Kolaybi::invoice()->create([
-            'contact_id' => 1
+            'contact_id' => 1,
         ]);
     }
 
@@ -81,8 +82,8 @@ class InvoiceResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/invoices/100' => Http::response([
                 'success' => true,
-                'data' => ['id' => 100]
-            ], 200)
+                'data' => ['id' => 100],
+            ], 200),
         ]);
 
         $response = Kolaybi::invoice()->find(100);
@@ -96,8 +97,8 @@ class InvoiceResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/invoices/999' => Http::response([
                 'success' => false,
-                'message' => 'Not Found'
-            ], 404)
+                'message' => 'Not Found',
+            ], 404),
         ]);
 
         $this->expectException(KolaybiApiException::class);
@@ -111,8 +112,8 @@ class InvoiceResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/invoices/e-document/create' => Http::response([
                 'success' => true,
-                'data' => ['status' => 'queued']
-            ], 200)
+                'data' => ['status' => 'queued'],
+            ], 200),
         ]);
 
         $response = Kolaybi::invoice()->formalize(100);
@@ -125,8 +126,8 @@ class InvoiceResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/invoices/e-document/create' => Http::response([
                 'success' => false,
-                'message' => 'Error'
-            ], 400)
+                'message' => 'Error',
+            ], 400),
         ]);
 
         $this->expectException(KolaybiApiException::class);
@@ -140,14 +141,14 @@ class InvoiceResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/invoices/proceed' => Http::response([
                 'success' => true,
-                'data' => ['id' => 1]
-            ], 200)
+                'data' => ['id' => 1],
+            ], 200),
         ]);
 
         $response = Kolaybi::invoice()->collect([
             'document_id' => 100,
             'vault_id' => 1,
-            'amount' => 500
+            'amount' => 500,
         ]);
 
         $this->assertTrue($response->isSuccess());
@@ -158,7 +159,7 @@ class InvoiceResourceTest extends TestCase
         $this->expectException(KolaybiValidationException::class);
 
         Kolaybi::invoice()->collect([
-            'document_id' => 100
+            'document_id' => 100,
         ]);
     }
 
@@ -166,8 +167,8 @@ class InvoiceResourceTest extends TestCase
     {
         Http::fake([
             '*/kolaybi/v1/invoices/100' => Http::response([
-                'success' => true
-            ], 200)
+                'success' => true,
+            ], 200),
         ]);
 
         $response = Kolaybi::invoice()->delete(100);
@@ -180,8 +181,8 @@ class InvoiceResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/invoices/100' => Http::response([
                 'success' => false,
-                'message' => 'Unauthorized'
-            ], 401)
+                'message' => 'Unauthorized',
+            ], 401),
         ]);
 
         $this->expectException(KolaybiApiException::class);
@@ -194,8 +195,8 @@ class InvoiceResourceTest extends TestCase
     {
         Http::fake([
             '*/kolaybi/v1/invoices/proceed/1' => Http::response([
-                'success' => true
-            ], 200)
+                'success' => true,
+            ], 200),
         ]);
 
         $response = Kolaybi::invoice()->deleteCollection(1);
@@ -208,8 +209,8 @@ class InvoiceResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/invoices/proceed/1' => Http::response([
                 'success' => false,
-                'message' => 'Error'
-            ], 500)
+                'message' => 'Error',
+            ], 500),
         ]);
 
         $this->expectException(KolaybiApiException::class);
@@ -222,8 +223,8 @@ class InvoiceResourceTest extends TestCase
     {
         Http::fake([
             '*/kolaybi/v1/invoices/e-document/cancel' => Http::response([
-                'success' => true
-            ], 200)
+                'success' => true,
+            ], 200),
         ]);
 
         $response = Kolaybi::invoice()->cancelEDocument(100);
@@ -236,8 +237,8 @@ class InvoiceResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/invoices/e-document/cancel' => Http::response([
                 'success' => false,
-                'message' => 'Cannot cancel'
-            ], 422)
+                'message' => 'Cannot cancel',
+            ], 422),
         ]);
 
         $this->expectException(KolaybiApiException::class);
@@ -250,8 +251,8 @@ class InvoiceResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/invoices/e-document/view*' => Http::response([
                 'success' => true,
-                'data' => 'html_content'
-            ], 200)
+                'data' => 'html_content',
+            ], 200),
         ]);
 
         $response = Kolaybi::invoice()->viewEDocument('uuid-string');
@@ -270,8 +271,8 @@ class InvoiceResourceTest extends TestCase
     {
         Http::fake([
             '*/kolaybi/v1/invoices/resend/100' => Http::response([
-                'success' => true
-            ], 200)
+                'success' => true,
+            ], 200),
         ]);
 
         $response = Kolaybi::invoice()->resendEDocument(100);
@@ -284,8 +285,8 @@ class InvoiceResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/invoices/resend/100' => Http::response([
                 'success' => false,
-                'message' => 'Limit reached'
-            ], 429)
+                'message' => 'Limit reached',
+            ], 429),
         ]);
 
         $this->expectException(KolaybiApiException::class);
@@ -299,13 +300,13 @@ class InvoiceResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/e_document/invoices*' => Http::response([
                 'success' => true,
-                'data' => []
-            ], 200)
+                'data' => [],
+            ], 200),
         ]);
 
         $response = Kolaybi::invoice()->listEInvoices([
             'company_id' => 5,
-            'direction' => 'inbound'
+            'direction' => 'inbound',
         ]);
 
         $this->assertTrue($response->isSuccess());

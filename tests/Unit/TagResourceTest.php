@@ -15,8 +15,8 @@ class TagResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/tags*' => Http::response([
                 'success' => true,
-                'data' => [['id' => 1, 'name' => 'Acil']]
-            ], 200)
+                'data' => [['id' => 1, 'name' => 'Acil']],
+            ], 200),
         ]);
 
         $response = Kolaybi::tag()->list(['group' => 'finance']);
@@ -37,8 +37,8 @@ class TagResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/tags/1' => Http::response([
                 'success' => true,
-                'data' => ['id' => 1, 'name' => 'Acil']
-            ], 200)
+                'data' => ['id' => 1, 'name' => 'Acil'],
+            ], 200),
         ]);
 
         $response = Kolaybi::tag()->find(1);
@@ -52,8 +52,8 @@ class TagResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/tags/999' => Http::response([
                 'success' => false,
-                'message' => 'Tag not found'
-            ], 404)
+                'message' => 'Tag not found',
+            ], 404),
         ]);
 
         $this->expectException(KolaybiApiException::class);

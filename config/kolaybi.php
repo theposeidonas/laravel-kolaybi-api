@@ -36,7 +36,7 @@ return [
     |
     */
 
-    'sandbox' => env('KOLAYBI_SANDBOX', false),
+    'sandbox' => (bool) env('KOLAYBI_SANDBOX', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -52,5 +52,40 @@ return [
     'base_url' => env('KOLAYBI_BASE_URL', env('KOLAYBI_SANDBOX', false)
         ? 'https://ofis-sandbox-api.kolaybi.com'
         : 'https://ofis-api.kolaybi.com'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | HTTP Options
+    |--------------------------------------------------------------------------
+    |
+    | Request timeout in seconds and retry behaviour for transient
+    | connection failures and 5xx responses.
+    |
+    */
+
+    'timeout' => (int) env('KOLAYBI_TIMEOUT', 30),
+
+    'connect_timeout' => (int) env('KOLAYBI_CONNECT_TIMEOUT', 10),
+
+    'retry' => [
+        'times' => (int) env('KOLAYBI_RETRY_TIMES', 0),
+        'sleep' => (int) env('KOLAYBI_RETRY_SLEEP', 200),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Token Cache
+    |--------------------------------------------------------------------------
+    |
+    | The bearer token is cached to avoid authenticating on every request.
+    | You may choose a dedicated cache store and the token lifetime here.
+    |
+    */
+
+    'cache' => [
+        'store' => env('KOLAYBI_CACHE_STORE'),
+        'prefix' => env('KOLAYBI_CACHE_PREFIX', 'kolaybi_bearer_token_'),
+        'ttl' => (int) env('KOLAYBI_TOKEN_TTL', 82800),
+    ],
 
 ];

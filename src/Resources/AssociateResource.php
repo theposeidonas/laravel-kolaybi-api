@@ -6,7 +6,9 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Validation\Rule;
 use Theposeidonas\Kolaybi\Enums\AddressType;
 use Theposeidonas\Kolaybi\Enums\AssociateType;
+use Theposeidonas\Kolaybi\Enums\CashFlowDirection;
 use Theposeidonas\Kolaybi\Enums\Currency;
+use Theposeidonas\Kolaybi\Enums\GatewayType;
 use Theposeidonas\Kolaybi\Exceptions\KolaybiApiException;
 use Theposeidonas\Kolaybi\Exceptions\KolaybiValidationException;
 use Theposeidonas\Kolaybi\Responses\KolaybiResponse;
@@ -14,11 +16,34 @@ use Theposeidonas\Kolaybi\Responses\KolaybiResponse;
 class AssociateResource extends BaseResource
 {
     /**
+     * @param  array<string, mixed>  $query
+     *
+     * @throws KolaybiApiException|KolaybiValidationException|ConnectionException
+     */
+    public function list(array $query = []): KolaybiResponse
+    {
+        $validated = $this->validate($query, [
+            'code' => 'nullable|string',
+            'name' => 'nullable|string',
+            'surname' => 'nullable|string',
+            'active' => 'nullable|boolean',
+            'identity_no' => 'nullable|string',
+            'email' => 'nullable|string',
+            'group' => 'nullable|string',
+            'source' => 'nullable|string',
+            'tag_ids' => 'nullable|array',
+            'tag_ids.*' => 'integer',
+        ]);
+
+        return $this->client->get('/kolaybi/v1/associates', $validated);
+    }
+
+    /**
      * @throws KolaybiApiException|ConnectionException
      */
-    public function list(): KolaybiResponse
+    public function find(int $associateId): KolaybiResponse
     {
-        return $this->client->get('/kolaybi/v1/associates');
+        return $this->client->get("/kolaybi/v1/associates/{$associateId}");
     }
 
     /**
@@ -34,9 +59,11 @@ class AssociateResource extends BaseResource
             'identity_no' => 'required|string|between:10,11',
             'is_corporate' => 'nullable|boolean',
             'associate_type' => ['nullable', Rule::in(AssociateType::values())],
+            'alias' => 'nullable|string',
             'tax_office' => 'nullable|string',
             'website' => 'nullable|url',
             'code' => 'nullable|string',
+            'source' => 'nullable|string',
             'tags' => 'nullable|array',
             'phone' => 'nullable|string',
             'email' => 'nullable|email',
@@ -95,27 +122,7 @@ class AssociateResource extends BaseResource
      */
     public function payment(int $id, array $data): KolaybiResponse
     {
-        $validated = $this->validate($data, [
-            'amount' => 'required|numeric',
-            'currency' => ['required', Rule::in(Currency::values())],
-            'gateway_id' => 'required|integer',
-            'gateway_type' => 'nullable|string|in:Vault,Associate',
-            'exchange_rate' => 'nullable|numeric',
-            'project_ids' => 'nullable|array',
-            'project_ids.*' => 'integer',
-            'description' => 'nullable|string',
-
-            'expenses' => 'nullable|array',
-            'expenses.*.source_type' => 'nullable|string|in:Associate,Vault',
-            'expenses.*.amount' => 'nullable|numeric',
-            'expenses.*.currency' => ['nullable', Rule::in(Currency::values())],
-            'expenses.*.source_id' => 'nullable|integer',
-
-            'transaction_currency_rates' => 'nullable|array',
-            'transaction_currency_rates.*.quote_currency' => ['nullable', Rule::in(Currency::values())],
-            'transaction_currency_rates.*.rate' => 'nullable|numeric',
-            'transaction_currency_rates.*.total' => 'nullable|numeric',
-        ]);
+        $validated = $this->validate($data, $this->transactionRules());
 
         return $this->client->post("/kolaybi/v1/associates/{$id}/transactions/payment", $validated);
     }
@@ -126,18 +133,64 @@ class AssociateResource extends BaseResource
      */
     public function proceed(int $id, array $data): KolaybiResponse
     {
+        $validated = $this->validate($data, $this->transactionRules());
+
+        return $this->client->post("/kolaybi/v1/associates/{$id}/transactions/proceed", $validated);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     *
+     * @throws KolaybiApiException|KolaybiValidationException|ConnectionException
+     */
+    public function transfer(int $id, array $data): KolaybiResponse
+    {
         $validated = $this->validate($data, [
+            'destination_associate_id' => 'required|integer',
+            'amount' => 'required|numeric',
+            'currency' => ['required', Rule::in(Currency::values())],
+            'cash_flow_direction' => ['required', 'integer', Rule::in([CashFlowDirection::IN->value, CashFlowDirection::OUT->value])],
+            'exchange_rate' => 'nullable|numeric',
+            'destination_currency' => ['nullable', Rule::in(Currency::values())],
+            'destination_exchange_rate' => 'nullable|numeric',
+            'issue_date' => 'nullable|string',
+            'description' => 'nullable|string',
+            'project_ids' => 'nullable|array',
+            'project_ids.*' => 'integer',
+
+            'expenses' => 'nullable|array',
+            'expenses.*.source_type' => ['nullable', 'string', Rule::in(GatewayType::values())],
+            'expenses.*.source_id' => 'nullable|integer',
+            'expenses.*.amount' => 'nullable|numeric',
+            'expenses.*.currency' => ['nullable', Rule::in(Currency::values())],
+            'expenses.*.exchange_rate' => 'nullable|numeric',
+
+            'transaction_currency_rates' => 'nullable|array',
+            'transaction_currency_rates.*.quote_currency' => ['nullable', Rule::in(Currency::values())],
+            'transaction_currency_rates.*.rate' => 'nullable|numeric',
+        ]);
+
+        return $this->client->post("/kolaybi/v1/associates/{$id}/transactions/transfer", $validated);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function transactionRules(): array
+    {
+        return [
             'amount' => 'required|numeric',
             'currency' => ['required', Rule::in(Currency::values())],
             'gateway_id' => 'required|integer',
-            'gateway_type' => 'nullable|string|in:Vault,Associate',
+            'gateway_type' => ['required', 'string', Rule::in(GatewayType::values())],
+            'issue_date' => 'nullable|string',
             'exchange_rate' => 'nullable|numeric',
             'project_ids' => 'nullable|array',
             'project_ids.*' => 'integer',
             'description' => 'nullable|string',
 
             'expenses' => 'nullable|array',
-            'expenses.*.source_type' => 'nullable|string|in:Associate,Vault',
+            'expenses.*.source_type' => ['nullable', 'string', Rule::in(GatewayType::values())],
             'expenses.*.amount' => 'nullable|numeric',
             'expenses.*.currency' => ['nullable', Rule::in(Currency::values())],
             'expenses.*.source_id' => 'nullable|integer',
@@ -146,8 +199,6 @@ class AssociateResource extends BaseResource
             'transaction_currency_rates.*.quote_currency' => ['nullable', Rule::in(Currency::values())],
             'transaction_currency_rates.*.rate' => 'nullable|numeric',
             'transaction_currency_rates.*.total' => 'nullable|numeric',
-        ]);
-
-        return $this->client->post("/kolaybi/v1/associates/{$id}/transactions/proceed", $validated);
+        ];
     }
 }

@@ -137,6 +137,7 @@ class AssociateResourceTest extends TestCase
             'amount' => 100,
             'currency' => 'TRY',
             'gateway_id' => 5,
+            'gateway_type' => 'Vault',
         ]);
 
         $this->assertTrue($response->isSuccess());
@@ -166,6 +167,7 @@ class AssociateResourceTest extends TestCase
             'amount' => 200,
             'currency' => 'USD',
             'gateway_id' => 10,
+            'gateway_type' => 'Vault',
         ]);
 
         $this->assertTrue($response->isSuccess());

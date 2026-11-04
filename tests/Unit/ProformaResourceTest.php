@@ -17,8 +17,8 @@ class ProformaResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/proformas' => Http::response([
                 'success' => true,
-                'data' => ['id' => 700]
-            ], 201)
+                'data' => ['id' => 700],
+            ], 201),
         ]);
 
         $response = Kolaybi::proforma()->create([
@@ -31,9 +31,9 @@ class ProformaResourceTest extends TestCase
                     'product_id' => 1,
                     'quantity' => '5',
                     'unit_price' => '200',
-                    'vat_rate' => VATRate::values()[0]
-                ]
-            ]
+                    'vat_rate' => VATRate::values()[0],
+                ],
+            ],
         ]);
 
         $this->assertTrue($response->isSuccess());
@@ -45,7 +45,7 @@ class ProformaResourceTest extends TestCase
         $this->expectException(KolaybiValidationException::class);
 
         Kolaybi::proforma()->create([
-            'contact_id' => 1
+            'contact_id' => 1,
         ]);
     }
 
@@ -54,8 +54,8 @@ class ProformaResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/proformas/700' => Http::response([
                 'success' => true,
-                'data' => ['id' => 700, 'description' => 'Proforma Detayı']
-            ], 200)
+                'data' => ['id' => 700, 'description' => 'Proforma Detayı'],
+            ], 200),
         ]);
 
         $response = Kolaybi::proforma()->find(700);
@@ -69,8 +69,8 @@ class ProformaResourceTest extends TestCase
         Http::fake([
             '*/kolaybi/v1/proformas/999' => Http::response([
                 'success' => false,
-                'message' => 'Proforma bulunamadı'
-            ], 404)
+                'message' => 'Proforma bulunamadı',
+            ], 404),
         ]);
 
         $this->expectException(KolaybiApiException::class);

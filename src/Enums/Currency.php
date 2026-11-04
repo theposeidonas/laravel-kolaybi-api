@@ -2,8 +2,12 @@
 
 namespace Theposeidonas\Kolaybi\Enums;
 
+use Theposeidonas\Kolaybi\Enums\Concerns\HasValues;
+
 enum Currency: string
 {
+    use HasValues;
+
     case TRY = 'TRY';
     case USD = 'USD';
     case EUR = 'EUR';
@@ -24,9 +28,4 @@ enum Currency: string
     case SAR = 'SAR';
     case AED = 'AED';
     case EGP = 'EGP';
-
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
-    }
 }
